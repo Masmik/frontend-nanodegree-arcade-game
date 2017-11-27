@@ -1,28 +1,21 @@
-// Enemies our player must avoid
-var rows = [60, 145, 225];
+//Enemy rendering location
+var rows = [65, 145, 225];
 
+// Enemies our player must avoid
 var Enemy = function (y) {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
     this.y = y;
     var min = 0;
     var max = 500;
     this.x = Math.floor(Math.random() * (max - min + 1)) + min;
     this.speed = Math.floor((Math.random() * 50) + 150);
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
+
+    //Loading the enemy image
     this.sprite = 'images/enemy-bug.png';
 };
 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
-
 Enemy.prototype.update = function (dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-    // dt *= 2;
-
     this.x = Math.round(this.x + this.speed * dt * 1.25);
 
     if (this.x >= 500) {
@@ -31,6 +24,7 @@ Enemy.prototype.update = function (dt) {
     }
 };
 
+//Random choice row for the enemy from the rows arrow
 function getEnemyRow() {
     return rows[Math.floor(Math.random() * rows.length)];
 }
@@ -40,40 +34,58 @@ Enemy.prototype.render = function () {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
+//Player class
 var Player = function () {
     this.x = 200;
-    this.y = 380;
+    this.y = 385;
     this.sprite = 'images/char-boy.png';
 };
 
+//Player update & collision function
 Player.prototype.update = function () {
-    if (this.y < 40) {
-        player.reset();
+    if (this.y < 50) {
+        this.reset();
     }
+
+    //Detected Collision
+    var collisionFactor = 20;
+    allEnemies.forEach(function (enemy) {
+        if (this.x - enemy.x < 0) {
+            return;
+        }
+
+        if (enemy.y === this.y && (this.x - enemy.x) < collisionFactor) {
+            console.log("thisX", this.x);
+            console.log("player.x - enemy.x", player.x - enemy.x);
+            this.reset();
+        }
+    }.bind(this));
 };
 
+// Draw the player on the screen, required method for game
 Player.prototype.render = function () {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+//Player handleInput realisation
 Player.prototype.handleInput = function (key) {
+
     if (key === 'left' && this.x >= 100) {
         this.x -= 100;
     } else if (key === 'right' && this.x <= 300) {
         this.x += 100;
-    } else if (key === 'up' && this.y > 80) {
+    } else if (key === 'up' && this.y > 50) {
         this.y -= 80;
+        console.log(player.y);
     } else if (key === 'down' && this.y < 360) {
         this.y += 80;
     }
 };
 
+//Moving the hero to the starting position
 Player.prototype.reset = function () {
     this.x = 200;
-    this.y = 380;
+    this.y = 385;
 };
 
 
@@ -102,3 +114,5 @@ document.addEventListener('keyup', function (e) {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
+
